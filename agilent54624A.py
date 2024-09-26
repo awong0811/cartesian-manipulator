@@ -84,7 +84,7 @@ class Agilent54624A():
         print("Waveform data display type set to ", type)
         return None
 
-    def retrieve_data(self, type = 'WORD'):
+    def retrieve_data(self):
         self.send_command(command = ":WAV:DATA?")
         wait = 5
         while wait > 0:
@@ -92,22 +92,6 @@ class Agilent54624A():
             wait -= 1
             time.sleep(1)
         print('[0]')
-        # if type=="WORD":
-        #     bytes_per_word = 2
-        #     response = self.connection.read(4011)
-        #     response = [response[i:i+bytes_per_word] for i in range(11, len(response), bytes_per_word)]
-        #     output = []
-        #     for x in response:
-        #         output.append(struct.unpack('>e', x)[0])
-        #         print(output[-1])
-        #     #response = [struct.unpack('<f', x)[0] for x in response]
-            
-        #     response = output
-        # elif type=="BYTE":
-        #     bytes_per_word = 1
-        #     response = self.connection.read(2000)
-        #     response = [response[i:i+bytes_per_word] for i in range(0, len(response), bytes_per_word)]
-            #response = [struct.unpack('<d', x)[0] for x in response]
             
         response = self.read_response()
         print()
@@ -141,17 +125,7 @@ class Agilent54624A():
         except Exception as e:
             print("Invalid response received! Error:", e)
 
-
-        # print("Datapoints: ", response)
         print("Points:", len(response))
-        # try:
-        #     import matplotlib.pyplot as plt
-        #     plt.plot(response)
-        #     plt.show()
-        #     return response
-        # except Exception as e:
-        #     print("Failed to plot:", e)
-        #     return None
         try:
             return response
         except Exception as e:
