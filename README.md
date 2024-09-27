@@ -1,4 +1,4 @@
-# UCLA NDE Lab
+# UCLA NDE Lab Cartesian Manipulator Project
 Anthony Wong, Jimmy Huang, Joshua Taylor, Tristan Leonetti
 
 ## Installation
@@ -17,3 +17,4 @@ Install the packages by running the following.
 $ pip install -r requirements.txt
 ```
 
+## 
