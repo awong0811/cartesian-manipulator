@@ -1,5 +1,5 @@
 import pymeasure
-from agilent54624A import Agilent54624A
+from src.agilent54624A import Agilent54624A
 print(pymeasure.__version__)
 
 instrument = Agilent54624A(port='COM1')

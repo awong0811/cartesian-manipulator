@@ -8,7 +8,7 @@ from pymeasure.experiment import Procedure, IntegerParameter, Parameter, FloatPa
 from pymeasure.experiment import Results
 from pymeasure.display.Qt import QtWidgets, fromUi
 from pymeasure.display.windows import ManagedWindow
-from agilent54624A import Agilent54624A
+from src.agilent54624A import Agilent54624A
 
 import logging
 log = logging.getLogger('')
