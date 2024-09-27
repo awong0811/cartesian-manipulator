@@ -17,4 +17,13 @@ Install the packages by running the following.
 $ pip install -r requirements.txt
 ```
 
-## 
+## How It Works
+
+### AGILENT54624A Wrapper
+This non-executable file in the src folder houses all of the I/O functions required to interface with the Agilent 54624A oscilloscope in the lab. Both the test.py and gui.py executable files use these functions to establish a connection, send commands, set oscilloscope settings, read responses, and decode responses. The docstrings in the file explain in greater detail how each function works.
+
+### test.py
+This executable file creates a simple GUI in the terminal so the programmer can test the oscilloscope wrapper.
+
+### gui.py
+This executable file opens up the pymeasure GUI where the user can run experiments.
