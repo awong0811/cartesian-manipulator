@@ -87,6 +87,9 @@ void loop()
   // Check if the switch is pressed
   if (switchState1 == LOW) {
     Serial.println(outputSwitch1); // Output the character to Serial Monitor
+    int distance = x1_stepper.distanceToGo();
+    if (distance>=0)
+      x1_stepper.stop();
   }
 
   // Check if we have a message from the PC
@@ -127,14 +130,11 @@ void loop()
             }
             else if (CMD == ':')
             {
-              int current = x1_stepper.currentPosition();
-              if (PARAM1>current && switchState1==HIGH || switchState1==LOW && PARAM1<current)
-                x1_stepper.moveTo(PARAM1);
+              x1_stepper.moveTo(PARAM1);
             }
             else if (CMD == '+')
             {
-              if (switchState1==HIGH)
-                x1_stepper.move(PARAM1);
+              x1_stepper.move(PARAM1);
             }
             else if (CMD == '-')
             {

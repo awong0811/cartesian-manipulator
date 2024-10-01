@@ -62,4 +62,15 @@ class Arduino():
         else:
             return False, 0
         
-    
+    def send_command(self, command: str):
+        '''
+        Sends a command by encoding the string command as bytes and appending a command terminator.
+        '''
+        if self.connection is not None:
+            try:
+                print(f'Sending command [{len(command)}]: {command}')
+                self.connection.write(command.encode() + b';') #sends command plus ; byte to terminate the command
+                return None
+            except serial.SerialException as c:
+                print("Error sending command:", c)
+                return None
