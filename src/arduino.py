@@ -42,14 +42,24 @@ class Arduino():
                 print("Error sending command:", c)
                 return None
             
-    def read_response(self, ):
+    def read_response(self):
         '''
-        Reads the serial output.
+        Reads the serial output and returns it.
         '''
         if self.connection is not None:
             if self.connection.in_waiting > 0: 
                 data = self.connection.readline().decode('utf-8').strip()  # Read and decode the data
-                if data[0] == 'S' and len(data)==2:
-                    switch_num = data[1]
-                    print(f"Switch {switch_num} pressed.")
+                return data
+        return None
+
+    def check_switch(self):
+        '''
+        Checks if the response is a switch press.
+        '''
+        data = self.read_response()
+        if len(data)==2 and data[0]=='S' and data[1].isnumeric():
+            return True, int(data[1])
+        else:
+            return False, 0
         
+    

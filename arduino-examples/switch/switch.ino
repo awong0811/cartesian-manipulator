@@ -13,6 +13,6 @@ void loop() {
   // Check if the switch is pressed
   if (switchState == LOW) {
     Serial.println(outputChar); // Output the character to Serial Monitor
-    delay(50); // Delay to avoid multiple readings from one press
+    delay(5); // Delay to avoid multiple readings from one press
   }
 }
