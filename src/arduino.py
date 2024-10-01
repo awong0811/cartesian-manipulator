@@ -44,11 +44,12 @@ class Arduino():
             
     def read_response(self, ):
         '''
-        Reads in from the 
+        Reads the serial output.
         '''
         if self.connection is not None:
             if self.connection.in_waiting > 0: 
                 data = self.connection.readline().decode('utf-8').strip()  # Read and decode the data
-                if data == 'A':
-                    print("Switch pressed: Received 'A' from Arduino.")
+                if data[0] == 'S' and len(data)==2:
+                    switch_num = data[1]
+                    print(f"Switch {switch_num} pressed.")
         
