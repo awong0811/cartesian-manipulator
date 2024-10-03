@@ -84,14 +84,14 @@ void loop()
 
   // Read the state of the switch
   int switchState1 = digitalRead(switchPin1);
-  // Check if the switch is pressed
-  if (switchState1 == LOW) {
-    Serial.println(outputSwitch1); // Output the character to Serial Monitor
-    int distance = x1_stepper.distanceToGo();
-    if (distance>=0)
+  // Check if the motor is moving forward or backward
+  if (x1_stepper.distanceToGo()>0) {
+    if (switchState1 == LOW) {
+      Serial.println(outputSwitch1); // Output the character to Serial Monitor
+      x1_stepper.setCurrentPosition(x1_stepper.currentPosition());
       x1_stepper.stop();
+    }
   }
-
   // Check if we have a message from the PC
   if (Serial.available())
   {
