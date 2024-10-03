@@ -45,8 +45,10 @@ AccelStepper z_stepper(AccelStepper::DRIVER, Z_PUL, Z_DIR);
 //
 char CMD;
 long PARAM1;
-const int switchPin1 = 22; // Pin connected to the NO switch
-const String outputSwitch1 = "S1"; // Character to output when switch is pressed
+const int switchPin1 = 22; // Pin connected to the NO switch, switch 1
+const String outputSwitch1 = "S1"; // Character to output when switch 1 is pressed
+const int switchPin2 = 23; // Switch 2
+const String outputSwitch2 = "S2";
 
 void setup()
 {
@@ -57,18 +59,19 @@ void setup()
   pinMode(Z_ENA, OUTPUT);
   digitalWrite(Z_ENA, LOW);
 
-  // Switch
-  pinMode(switchPin1, INPUT_PULLUP); // Set the switch pin as an INPUT
+  // Set each of the switch pins to input with inbuilt pullup resistor
+  pinMode(switchPin1, INPUT_PULLUP);
+  pinMode(switchPin2, INPUT_PULLUP);
 
   // Set the speeds for each motor
   x1_stepper.setMaxSpeed(2500.0);
-//  x1_stepper.setSpeed(2500.0);
+  // x1_stepper.setSpeed(2500.0);
   x1_stepper.setAcceleration(1000.0);
   x2_stepper.setMaxSpeed(2500.0);
-//  x2_stepper.setSpeed(250000.0);
+  // x2_stepper.setSpeed(250000.0);
   x2_stepper.setAcceleration(1000.0);
   y_stepper.setMaxSpeed(2500.0);
-//  y_stepper.setSpeed(250000.0);
+  // y_stepper.setSpeed(250000.0);
   y_stepper.setAcceleration(1000.0);
   z_stepper.setMaxSpeed(2500.0);
   z_stepper.setAcceleration(500.0);
@@ -82,9 +85,11 @@ void loop()
   y_stepper.run();
   z_stepper.run();
 
+  //////////////////// SWITCHES
   // Read the state of the switch
   int switchState1 = digitalRead(switchPin1);
-  // Check if the motor is moving forward or backward
+  int switchState2 = digitalRead(switchPin2);
+  // Check if the motor is moving forward or backward (only stop the motor if it is moving forward into the switch)
   if (x1_stepper.distanceToGo()>0) {
     if (switchState1 == LOW) {
       Serial.println(outputSwitch1); // Output the character to Serial Monitor
@@ -92,6 +97,15 @@ void loop()
       x1_stepper.stop();
     }
   }
+  if (x2_stepper.distanceToGo()>0) {
+    if (switchState2 == LOW) {
+      Serial.println(outputSwitch2); // Output the character to Serial Monitor
+      x2_stepper.setCurrentPosition(x2_stepper.currentPosition());
+      x2_stepper.stop();
+    }
+  }
+  //////////////////////////////
+  
   // Check if we have a message from the PC
   if (Serial.available())
   {
