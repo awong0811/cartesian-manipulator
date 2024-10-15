@@ -2,8 +2,8 @@ name: nde-pymeasure
 channels:
   - defaults
 dependencies:
-  - python=3.8
+  - python=3.7.16
   - pip
   - pip:
     - pymeasure
-    - serial
+    - pyserial

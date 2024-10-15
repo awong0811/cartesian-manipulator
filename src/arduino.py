@@ -12,17 +12,18 @@ class Arduino():
 
     def connect(self):
         '''
-        Establish a connection between the computer and the oscilloscope.
+        Establish a connection between the computer and the Arduino.
         '''
         try: 
             self.connection = serial.Serial(self.port, baudrate=self.baudrate, timeout = self.timeout)
             print("Connected to instrument")
+            time.sleep(1)
         except serial.SerialException as e:
             print("Failed to connect to instrument:", e)
 
     def disconnect(self):
         '''
-        Close the connection between the computer and the oscilloscope.
+        Close the connection between the computer and the Arduino.
         '''
         if self.connection is not None:
             self.connection.close()
@@ -36,7 +37,8 @@ class Arduino():
         if self.connection is not None:
             try:
                 print(f'Sending command [{len(command)}]: {command}')
-                self.connection.write(command.encode() + b';') #sends command plus ; byte to terminate the command
+                command = command + '\n'
+                self.connection.write(command.encode()) #sends command
                 return None
             except serial.SerialException as c:
                 print("Error sending command:", c)
@@ -47,7 +49,7 @@ class Arduino():
         Reads the serial output and returns it.
         '''
         if self.connection is not None:
-            if self.connection.in_waiting > 0: 
+            if self.connection.in_waiting > 0:
                 data = self.connection.readline().decode('utf-8').strip()  # Read and decode the data
                 return data
         return None
@@ -62,15 +64,4 @@ class Arduino():
         else:
             return False, 0
         
-    def send_command(self, command: str):
-        '''
-        Sends a command by encoding the string command as bytes and appending a command terminator.
-        '''
-        if self.connection is not None:
-            try:
-                print(f'Sending command [{len(command)}]: {command}')
-                self.connection.write(command.encode() + b';') #sends command plus ; byte to terminate the command
-                return None
-            except serial.SerialException as c:
-                print("Error sending command:", c)
-                return None
+    

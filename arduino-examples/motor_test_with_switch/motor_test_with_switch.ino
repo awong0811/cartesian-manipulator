@@ -142,6 +142,12 @@ void loop()
               Serial.print(x1_stepper.currentPosition());
               Serial.print('\n');
             }
+            else if (CMD == '#')
+            {
+              Serial.print("X1#");
+              Serial.print(x1_stepper.distanceToGo());
+              Serial.print('\n');
+            }
             else if (CMD == ':')
             {
               x1_stepper.moveTo(PARAM1);
@@ -166,6 +172,12 @@ void loop()
             {
               Serial.print("X2@");
               Serial.print(x2_stepper.currentPosition());
+              Serial.print('\n');
+            }
+            else if (CMD == '#')
+            {
+              Serial.print("X2#");
+              Serial.print(x2_stepper.distanceToGo());
               Serial.print('\n');
             }
             else if (CMD == ':')
@@ -232,7 +244,7 @@ bool getCommand()
     CMD = Serial.read();
 
     // Where query
-    if (CMD == '?')
+    if (CMD == '?' || CMD == '#')
     {
       return true;
     }
