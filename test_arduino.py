@@ -27,25 +27,12 @@ wait_times = {
     11: 7.5
 }
 
-# instrument.send_command(command='X1-10000,X2-10000')
-# time.sleep(10)
 
-# dist = 9999
-# instrument.send_command(command=f'X2-{dist}')
-# time.sleep(wait_times[dist//1000+1])
-dist = 4999
-instrument.send_command(command=f'X2+{dist}')
-time.sleep(wait_times[dist//1000+1])
-instrument.send_command(command=f'X2+{dist}')
-time.sleep(wait_times[dist//1000+1])
 
-# dist = 20000
-# instrument.send_command(command=f'X2+{dist}')
-# time.sleep(15)
-# dist = 19000
-# instrument.send_command(command=f'X2-{dist}')
-# time.sleep(15)
+instrument.reset([1,2])
+for i in range(10):
+    instrument.move([1],[1000])
+    instrument.move([2],[1000])
 
-# 19000 is the max distance from the switch!!!
 
 instrument.disconnect()

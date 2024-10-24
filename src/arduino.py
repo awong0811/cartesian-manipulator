@@ -1,5 +1,7 @@
 import serial
 import time
+import config
+from typing import List
 
 class Arduino():
     def __init__(self, port, baudrate=9600, timeout=1):
@@ -9,6 +11,10 @@ class Arduino():
         self.port = port
         self.baudrate = baudrate
         self.timeout = timeout
+        self.motor1_coord = 0
+        self.motor2_coord = 0
+        self.motor3_coord = 0
+        self.motor4_coord = 0
 
     def connect(self):
         '''
@@ -63,5 +69,37 @@ class Arduino():
             return True, int(data[1])
         else:
             return False, 0
-        
     
+    def reset(self, motor: List):
+        assert(len(motor)<=4)
+        assert(max(motor)<=4)
+        dist = []
+        for i in range(len(motor)):
+            dist.append(-19000)
+        self.move(motor=motor,dist=dist)
+        self.motor1_coord = 0
+        self.motor2_coord = 0
+        self.motor3_coord = 0
+        self.motor4_coord = 0
+        return
+
+
+    def move(self, motor: List, dist: List):
+        command = ''
+        assert(len(motor)==len(dist))
+        assert(len(motor)<=4)
+        assert(max(motor)<=4)
+        assert(max([abs(x) for x in dist])<=19000)
+        for i in range(len(motor)):
+            # flip the sign
+            if dist[i]<0:
+                sign = '+'
+            else:
+                sign = ''
+            command = command + f',X{motor[i]}'+sign+f'{-1*dist[i]}'
+        self.send_command(command=command[1:])
+        time.sleep(config.wait_times[max([abs(x) for x in dist])//1000+1])
+        return dist
+    
+    # def get_coords(self):
+        
