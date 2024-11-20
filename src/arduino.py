@@ -11,10 +11,8 @@ class Arduino():
         self.port = port
         self.baudrate = baudrate
         self.timeout = timeout
-        self.motor1_coord = 0
-        self.motor2_coord = 0
-        self.motor3_coord = 0
-        self.motor4_coord = 0
+        for i in range(4):
+            setattr(self, f'motor{i}', 0)
 
     def connect(self):
         '''
@@ -91,15 +89,36 @@ class Arduino():
         assert(max(motor)<=4)
         assert(max([abs(x) for x in dist])<=19000)
         for i in range(len(motor)):
-            # flip the sign
-            if dist[i]<0:
+            distance = dist[i]
+            # check position of motor
+            pos = getattr(self, f'motor{i}')
+            if 0<=pos<=config.max_distance:
+                destination = pos+distance
+                if destination > 19000:
+                    distance = 19000-pos
+                    destination = 19000
+                elif destination < 0:
+                    distance = -pos
+                    destination = 0
+            # flip the sign in the command to the arduino
+            if distance<0:
                 sign = '+'
             else:
-                sign = ''
-            command = command + f',X{motor[i]}'+sign+f'{-1*dist[i]}'
+                sign = '-'
+            command = command + f',X{motor[i]}'+sign+f'{abs(distance)}'
+            # save the position of each motor
+            setattr(self, f'motor{i}', destination)
         self.send_command(command=command[1:])
+        # wait for all the motors for finish moving
         time.sleep(config.wait_times[max([abs(x) for x in dist])//1000+1])
         return dist
     
-    # def get_coords(self):
+    def get_coords(self):
+        coords = []
+        print("Getting motor coordinates:")
+        for i in range(4):
+            coord = getattr(self, f'motor{i}')
+            coords.append(coord)
+            print(f"Motor {i}: {coord}")
+        return coord
         

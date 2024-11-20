@@ -28,8 +28,8 @@ wait_times = {
 }
 
 
-
-instrument.reset([1,2])
+instrument.reset([1])
+instrument.reset([2])
 for i in range(10):
     instrument.move([1],[1000])
     instrument.move([2],[1000])
