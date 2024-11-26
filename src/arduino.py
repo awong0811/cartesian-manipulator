@@ -78,7 +78,11 @@ class Arduino():
         ### RESET ALL MOTORS AT ONCE ###
         command = ""
         for x in motor:
-            command = command + ',' + config.MOTOR_NAME[x] + f'+19000'
+            name = config.MOTOR_NAME[x]
+            if x == 3:
+                command = command + ',' + name + f'-19000'
+            else:
+                command = command + ',' + name + f'+19000'
         self.send_command(command=command[1:])
         count = 0
         while True:
@@ -130,9 +134,15 @@ class Arduino():
                 destination = distance
             # flip the sign in the command to the arduino
             if distance<0:
-                sign = '+'
+                if motor[i]==3:
+                    sign='-'
+                else:
+                    sign = '+'
             else:
-                sign = '-'
+                if motor[i]==3:
+                    sign='+'
+                else:
+                    sign = '-'
             command = command + ',' + config.MOTOR_NAME[motor[i]] + sign + f'{abs(distance)}'
             # command = command + f',X{motor[i]}'+sign+f'{abs(distance)}'
             # save the position of each motor
