@@ -49,6 +49,8 @@ const int switchPin1 = 22; // Pin connected to the NO switch, switch 1
 const String outputSwitch1 = "S1"; // Character to output when switch 1 is pressed
 const int switchPin2 = 23; // Switch 2
 const String outputSwitch2 = "S2";
+const int switchPin3 = 24;
+const String outputSwitch3 = "S3";
 
 void setup()
 {
@@ -62,6 +64,7 @@ void setup()
   // Set each of the switch pins to input with inbuilt pullup resistor
   pinMode(switchPin1, INPUT_PULLUP);
   pinMode(switchPin2, INPUT_PULLUP);
+  pinMode(switchPin3, INPUT_PULLUP);
 
   // Set the speeds for each motor
   x1_stepper.setMaxSpeed(2500.0);
@@ -89,6 +92,7 @@ void loop()
   // Read the state of the switch
   int switchState1 = digitalRead(switchPin1);
   int switchState2 = digitalRead(switchPin2);
+  int switchState3 = digitalRead(switchPin3);
   // Check if the motor is moving forward or backward (only stop the motor if it is moving forward into the switch)
   if (x1_stepper.distanceToGo()>0) {
     if (switchState1 == LOW) {
@@ -102,6 +106,13 @@ void loop()
       Serial.println(outputSwitch2); // Output the character to Serial Monitor
       x2_stepper.setCurrentPosition(x2_stepper.currentPosition());
       x2_stepper.stop();
+    }
+  }
+  if (y_stepper.distanceToGo()<0) {
+    if (switchState3 == LOW) {
+      Serial.println(outputSwitch3); // Output the character to Serial Monitor
+      y_stepper.setCurrentPosition(y_stepper.currentPosition());
+      y_stepper.stop();
     }
   }
   //////////////////////////////
@@ -142,12 +153,6 @@ void loop()
               Serial.print(x1_stepper.currentPosition());
               Serial.print('\n');
             }
-            else if (CMD == '#')
-            {
-              Serial.print("X1#");
-              Serial.print(x1_stepper.distanceToGo());
-              Serial.print('\n');
-            }
             else if (CMD == ':')
             {
               x1_stepper.moveTo(PARAM1);
@@ -172,12 +177,6 @@ void loop()
             {
               Serial.print("X2@");
               Serial.print(x2_stepper.currentPosition());
-              Serial.print('\n');
-            }
-            else if (CMD == '#')
-            {
-              Serial.print("X2#");
-              Serial.print(x2_stepper.distanceToGo());
               Serial.print('\n');
             }
             else if (CMD == ':')
@@ -244,7 +243,7 @@ bool getCommand()
     CMD = Serial.read();
 
     // Where query
-    if (CMD == '?' || CMD == '#')
+    if (CMD == '?')
     {
       return true;
     }
