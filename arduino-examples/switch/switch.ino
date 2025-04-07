@@ -1,4 +1,4 @@
-const int switchPin = 22; // Pin connected to the NO switch
+const int switchPin = 8; // Pin connected to the NO switch
 const String outputChar = "S1"; // Character to output when switch is pressed
 
 void setup() {

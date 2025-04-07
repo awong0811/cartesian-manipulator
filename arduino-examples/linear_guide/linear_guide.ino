@@ -10,8 +10,8 @@ AccelStepper x1_stepper(AccelStepper::DRIVER, X1_PUL, X1_DIR);
 
 void setup() {
   Serial.begin(9600); // Initialize serial communication
-  x1_stepper.setMaxSpeed(2500.0); // Set the maximum speed
-  x1_stepper.setAcceleration(1000.0); // Set the acceleration
+  x1_stepper.setMaxSpeed(1000.0); // Set the maximum speed
+  x1_stepper.setAcceleration(500.0); // Set the acceleration
 }
 
 void loop() {

@@ -160,3 +160,42 @@ class Arduino():
             coords.append(coord)
             print(f"Motor {i+1}: {coord}")
         return coords
+    
+    def setup(self):
+        time.sleep(5)
+        response = self.read_response()
+        for r in response:
+            print(r)
+        user_input = input()
+        while user_input != 't':
+            user_input = input()
+        self.send_command(command=user_input)
+        time.sleep(2)
+        response = self.read_response()
+        for r in response:
+            print(r)
+        while True:
+            user_input = input()
+            if user_input == 'd':
+                self.send_command(command=user_input)
+                break
+            try:
+                user_input = int(user_input)
+            except ValueError:
+                print("Not a valid integer.")
+            self.move(motor=[4], dist=[user_input], override=True)
+        time.sleep(2)
+        response = self.read_response()
+        for r in response:
+            print(r)
+        user_input = input()
+        self.send_command(command=user_input)
+        time.sleep(2)
+        response = self.read_response()
+        for r in response:
+            print(r)
+        time.sleep(2)
+        response = self.read_response()
+        for r in response:
+            print(r)
+        return
