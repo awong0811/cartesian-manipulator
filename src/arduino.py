@@ -122,7 +122,8 @@ class Arduino():
             distance = dist[i]
             # check position of motor
             pos = getattr(self, f'motor{motor[i]}')
-            if not override and 0<=pos<=config.max_distance:
+            # if not override and 0<=pos<=config.max_distance:
+            if not override and pos<=config.max_distance:
                 destination = pos+distance
                 if destination > 19000:
                     distance = 19000-pos
@@ -152,6 +153,22 @@ class Arduino():
         time.sleep(config.wait_times[max([abs(x) for x in dist])//1000+1])
         return dist
     
+    def moveTo(self, motor: List, destination: List):
+        coords = self.get_coords()
+        dist = []
+        for i,m in enumerate(motor):
+            dist.append(destination[i] - coords[m-1])
+        dist = self.move(motor=motor, dist=dist)
+        return dist
+
+    def get_load(self):
+        self.send_command(command='l')
+        time.sleep(0.5)
+        response = self.read_response()[0]
+        print(response)
+        load = float(response[22:])
+        return load
+
     def get_coords(self):
         coords = []
         print("Getting motor coordinates:")
@@ -190,11 +207,7 @@ class Arduino():
             print(r)
         user_input = input()
         self.send_command(command=user_input)
-        time.sleep(2)
-        response = self.read_response()
-        for r in response:
-            print(r)
-        time.sleep(2)
+        time.sleep(5)
         response = self.read_response()
         for r in response:
             print(r)
