@@ -33,14 +33,14 @@ instrument.moveTo(motor=[2], destination=[0])
 for i in range(len(user_coords)):
     instrument.moveTo(motor=[2], destination=[user_coords[i]])
     instrument.move(motor=[4], dist=[-1000], override=True)
-    # while True:
-    #     load = instrument.send_command('l')
-    prev_error = 0
+    prev_error = None
     while True:
         load = instrument.get_load()
         error = load - target
         if error <= tolerance:
             break
+        if prev_error is None:
+            prev_error = error
         correction = error*kp + kd*(error-prev_error)
         instrument.move(motor=[4], dist=[correction])
         prev_error = error
