@@ -55,6 +55,7 @@ HX711_ADC LoadCell(HX711_dout, HX711_sck);
 //
 char CMD;
 long PARAM1;
+float i = 0;
 const int switchPin1 = 23;          // Pin connected to the NO switch, switch 1, for motor x1
 const String outputSwitch1 = "S1";  // Character to output when switch 1 is pressed
 const int switchPin2 = 22;          // Switch 2, for motor x2
@@ -105,6 +106,7 @@ void setup() {
     LoadCell.setCalFactor(1.0);  // user set calibration value (float), initial value 1.0 may be used for this sketch
     Serial.println("Startup is complete");
   }
+  LoadCell.setSamplesInUse(100);
 }
 
 void loop() {
@@ -187,27 +189,24 @@ void loop() {
     calibrated = true;
   }
   static boolean newDataReady = 0;
-  const int serialPrintInterval = 0;  //increase value to slow down serial print activity
 
   // check for new data/start next conversion:
-  // if (LoadCell.update()) newDataReady = true;
+  if (LoadCell.update()) newDataReady = true;
 
-  // if (millis() - previousMillis >= interval) {  // If 1 second has passed
-  //   previousMillis = millis();  // Save the current time
+  if (millis() - previousMillis >= interval) {  // If 1 second has passed
+    previousMillis = millis();  // Save the current time
 
-  //   // Update the load cell and get the new data
-  //   if (LoadCell.update()) {
-  //     newDataReady = true;
-  //   }
+    // Update the load cell and get the new data
+    if (LoadCell.update()) {
+      newDataReady = true;
+    }
 
-  //   // Get smoothed value from the dataset:
-  //   if (newDataReady) {
-  //     float i = LoadCell.getData();
-  //     Serial.print("Load_cell output val: ");
-  //     Serial.println(i);
-  //     newDataReady = 0;
-  //   }
-  // }
+    // Get smoothed value from the dataset:
+    if (newDataReady) {
+      i = LoadCell.getData();
+      newDataReady = 0;
+    }
+  }
 
   x1_stepper.run();
   x2_stepper.run();
@@ -242,25 +241,13 @@ void loop() {
     }
   }
   //////////////////////////////
-
   // Check if we have a message from the PC
   if (Serial.available()) {
     char in = Serial.read();
-
     // get load cell output
-    if (in == 'l' && millis() - previousMillis >= interval) {  // If 1 second has passed
-      previousMillis = millis();  // Save the current time
-      // Update the load cell and get the new data
-      if (LoadCell.update()) {
-        newDataReady = true;
-      }
-      // Get smoothed value from the dataset:
-      if (newDataReady) {
-        float i = LoadCell.getData();
-        Serial.print("Load_cell output val: ");
-        Serial.println(i);
-        newDataReady = 0;
-      }
+    if (in == 'l') {
+      Serial.print("Load_cell output val: ");
+      Serial.println(i);
     }
 
     // moveTo command sets the target, then waits for the run command to do the steps

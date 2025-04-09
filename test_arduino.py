@@ -30,14 +30,18 @@ print(f"Number of coordinates received: {len(user_coords)}")
 instrument.move(motor=[2],dist=[200])
 instrument.moveTo(motor=[2], destination=[0])
 
+# MAKE SURE TO UPDATE ARDUINO SCRIPT TO TAKE AVERAGE OF 10 LOAD CELL READINGS WHEN 'l' is received
+guess = -2000
 for i in range(len(user_coords)):
     instrument.moveTo(motor=[2], destination=[user_coords[i]])
-    instrument.move(motor=[4], dist=[-1000], override=True)
+    instrument.move(motor=[4], dist=[guess], override=True)
     prev_error = None
     while True:
         load = instrument.get_load()
         error = load - target
         if error <= tolerance:
+            print(f'Final load: {load}')
+            time.sleep(10)
             break
         if prev_error is None:
             prev_error = error
