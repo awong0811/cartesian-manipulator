@@ -132,7 +132,10 @@ class Arduino():
                     distance = -pos
                     destination = 0
             if override:
-                destination = distance
+                if motor[i]!=4:
+                    destination = distance
+                else:
+                    setattr(self, 'motor4', pos+distance)
             # flip the sign in the command to the arduino
             if distance<0:
                 if motor[i]==3:
@@ -147,7 +150,8 @@ class Arduino():
             command = command + ',' + config.MOTOR_NAME[motor[i]] + sign + f'{abs(distance)}'
             # command = command + f',X{motor[i]}'+sign+f'{abs(distance)}'
             # save the position of each motor
-            setattr(self, f'motor{motor[i]}', destination)
+            if motor[i]!=4:
+                setattr(self, f'motor{motor[i]}', destination)
         self.send_command(command=command[1:])
         # wait for all the motors for finish moving
         time.sleep(config.wait_times[max([abs(x) for x in dist])//1000+1])
@@ -211,4 +215,5 @@ class Arduino():
         response = self.read_response()
         for r in response:
             print(r)
+        self.moveTo(motor=[4], destination=[0])
         return
