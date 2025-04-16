@@ -1,24 +1,31 @@
 from src.arduino import Arduino
 import time
+from src.agilent54624A import Agilent54624A
 
 tolerance = 0.5
 target = 50
 kp, kd = 1/0.169, 0
 
-instrument = Arduino(port='COM16')
-instrument.connect()
-boundary_condition = instrument.setup()
-instrument.send_command(command='X1?')
+# Set up oscilloscope
+oscilloscope = Agilent54624A(port='COM1')
+oscilloscope.connect()
+oscilloscope.checkOperational()
+
+# Set up arduino
+arduino = Arduino(port='COM16')
+arduino.connect()
+boundary_condition = arduino.setup()
+arduino.send_command(command='X1?')
 time.sleep(0.5)
-response = instrument.read_response()
+response = arduino.read_response()
 print(response)
-instrument.send_command(command='X2?')
+arduino.send_command(command='X2?')
 time.sleep(0.5)
-response = instrument.read_response()
+response = arduino.read_response()
 print(response)
 
 ################################
-# instrument.reset([1,2,3])
+# arduino.reset([1,2,3])
 ################################
 
 print("Specify 5 coordinates, separated by spaces: ")
@@ -27,20 +34,22 @@ user_coords = user_input.split()
 user_coords = list(map(int, user_coords))
 print(f"Number of coordinates received: {len(user_coords)}")
 
-# instrument.move(motor=[2],dist=[200])
-# instrument.moveTo(motor=[2], destination=[0])
+# arduino.move(motor=[2],dist=[200])
+# arduino.moveTo(motor=[2], destination=[0])
 
-# MAKE SURE TO UPDATE ARDUINO SCRIPT TO TAKE AVERAGE OF 10 LOAD CELL READINGS WHEN 'l' is received
+##############################################################################
+# Measurement loop
+##############################################################################
 pos, weight = boundary_condition
 initial_guess = round(pos+kp*(float(weight) - target))
 for i in range(len(user_coords)):
-    instrument.moveTo(motor=[2], destination=[user_coords[i]])
-    instrument.move(motor=[4], dist=[initial_guess], override=True)
+    arduino.moveTo(motor=[2], destination=[user_coords[i]])
+    arduino.move(motor=[4], dist=[initial_guess], override=True)
     time.sleep(3)
-    print(f'Initial load: {instrument.get_load()}')
+    print(f'Initial load: {arduino.get_load()}')
     prev_error = None
     while True:
-        load = instrument.get_load()
+        load = arduino.get_load()
         error = load - target
         print(f'Load: {load}, Error: {error}')
         if abs(error) <= tolerance:
@@ -51,24 +60,26 @@ for i in range(len(user_coords)):
             prev_error = error
         correction = error*kp + kd*(error-prev_error)
         print(f'Correction: {correction}')
-        instrument.move(motor=[4], dist=[round(correction)], override=True)
+        arduino.move(motor=[4], dist=[round(correction)], override=True)
         prev_error = error
         time.sleep(3)
-    instrument.moveTo(motor=[4], destination=[0])
+    oscilloscope.collect_datapoints('tx')
+    oscilloscope.collect_datapoints('rx')
+    arduino.moveTo(motor=[4], destination=[0])
 
-instrument.moveTo(motor=[2], destination=[0])
+arduino.moveTo(motor=[2], destination=[0])
 
 
-# instrument.move(motor=[2, 3], dist=[2000, 1000], override=True)
-# instrument.move(motor=[1,2,3],dist=[2000,3000,-5000],override=True)
-# instrument.move(motor=[1,2], dist=[2000,1000])
-# instrument.move(motor=[1,2], dist=[1000,2000])
-# instrument.move(motor=[3],dist=[5000],override=True)
-# instrument.reset([1,2])
+# arduino.move(motor=[2, 3], dist=[2000, 1000], override=True)
+# arduino.move(motor=[1,2,3],dist=[2000,3000,-5000],override=True)
+# arduino.move(motor=[1,2], dist=[2000,1000])
+# arduino.move(motor=[1,2], dist=[1000,2000])
+# arduino.move(motor=[3],dist=[5000],override=True)
+# arduino.reset([1,2])
 # for i in range(3):
-#     instrument.move([1],[1000])
-#     instrument.move([2],[1000])
-instrument.get_coords()
+#     arduino.move([1],[1000])
+#     arduino.move([2],[1000])
+arduino.get_coords()
 
-
-instrument.disconnect()
+oscilloscope.disconnect()
+arduino.disconnect()

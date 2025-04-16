@@ -1,6 +1,7 @@
 import serial
 import time
 import struct
+from typing import Union
 
 class Agilent54624A():
     def __init__(self, port, baudrate=9600, timeout=1):
@@ -165,3 +166,22 @@ class Agilent54624A():
         except Exception as e:
             print("No response")
             return None
+        
+    def collect_datapoints(self, channel: Union[int, str]):
+        if not isinstance(channel, (int, str)):
+            raise TypeError("channel must be an int or str")
+        if isinstance(channel, str):
+            channel = channel.lower()
+            if channel in ("tx", "transmitter"):
+                channel = 1
+            elif channel in ("rx", "receiver"):
+                channel = 2
+            else:
+                raise ValueError("channel must be 'tx', 'transmitter', 'rx', or 'receiver'.")
+        elif isinstance(channel, int):
+            if channel not in [1, 2, 3, 4]:
+                raise ValueError("channel must be chosen from [1, 2, 3, 4].")
+        self.select_channel(channel)
+        self.set_waveform_type("WORD")
+        self.retrieve_data("WORD")
+        return
