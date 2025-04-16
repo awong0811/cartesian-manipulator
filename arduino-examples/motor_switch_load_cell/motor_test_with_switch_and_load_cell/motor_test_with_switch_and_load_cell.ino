@@ -58,11 +58,12 @@ long PARAM1;
 float i = 0;
 const int switchPin1 = 23;          // Pin connected to the NO switch, switch 1, for motor x1
 const String outputSwitch1 = "S1";  // Character to output when switch 1 is pressed
-const int switchPin2 = 22;          // Switch 2, for motor x2
+const int switchPin2 = 43;          // Switch 2, for motor x2
 const String outputSwitch2 = "S2";
-const int switchPin3 = 24; // Switch 3, for motor y
+const int switchPin3 = 31; // Switch 3, for motor y
 const String outputSwitch3 = "S3";
-
+const int switchPin4 = 39; // Switch 4, for motor z
+const String outputSwitch4 = "S4";
 
 const int calVal_eepromAdress = 0;
 unsigned long t = 0;
@@ -79,6 +80,7 @@ void setup() {
   pinMode(switchPin1, INPUT_PULLUP);
   pinMode(switchPin2, INPUT_PULLUP);
   pinMode(switchPin3, INPUT_PULLUP);
+  pinMode(switchPin4, INPUT_PULLUP);
 
   // Set the speeds for each motor
   x1_stepper.setMaxSpeed(500.0);
@@ -218,6 +220,7 @@ void loop() {
   int switchState1 = digitalRead(switchPin1);
   int switchState2 = digitalRead(switchPin2);
   int switchState3 = digitalRead(switchPin3);
+  int switchState4 = digitalRead(switchPin4);
   // Check if the motor is moving forward or backward (only stop the motor if it is moving forward into the switch)
   if (x1_stepper.distanceToGo() > 0) {
     if (switchState1 == LOW) {
@@ -233,11 +236,18 @@ void loop() {
       x2_stepper.stop();
     }
   }
-  if (y_stepper.distanceToGo() < 0) {
+  if (y_stepper.distanceToGo() > 0) {
     if (switchState3 == LOW) {
       Serial.println(outputSwitch3);  // Output the character to Serial Monitor
       y_stepper.setCurrentPosition(y_stepper.currentPosition());
       y_stepper.stop();
+    }
+  }
+  if (z_stepper.distanceToGo() < 0) {
+    if (switchState4 == LOW) {
+      Serial.println(outputSwitch4);  // Output the character to Serial Monitor
+      z_stepper.setCurrentPosition(z_stepper.currentPosition());
+      z_stepper.stop();
     }
   }
   //////////////////////////////
