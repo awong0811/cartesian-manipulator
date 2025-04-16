@@ -3,11 +3,11 @@ import time
 
 tolerance = 0.5
 target = 50
-kp, kd = 1/0.17, 1e-1
+kp, kd = 1/0.169, 0
 
 instrument = Arduino(port='COM16')
 instrument.connect()
-instrument.setup()
+boundary_condition = instrument.setup()
 instrument.send_command(command='X1?')
 time.sleep(0.5)
 response = instrument.read_response()
@@ -31,11 +31,12 @@ print(f"Number of coordinates received: {len(user_coords)}")
 # instrument.moveTo(motor=[2], destination=[0])
 
 # MAKE SURE TO UPDATE ARDUINO SCRIPT TO TAKE AVERAGE OF 10 LOAD CELL READINGS WHEN 'l' is received
-guess = -2000
+pos, weight = boundary_condition
+initial_guess = round(pos+kp*(float(weight) - target))
 for i in range(len(user_coords)):
     instrument.moveTo(motor=[2], destination=[user_coords[i]])
-    instrument.move(motor=[4], dist=[guess], override=True)
-    time.sleep(5)
+    instrument.move(motor=[4], dist=[initial_guess], override=True)
+    time.sleep(3)
     print(f'Initial load: {instrument.get_load()}')
     prev_error = None
     while True:
@@ -44,7 +45,7 @@ for i in range(len(user_coords)):
         print(f'Load: {load}, Error: {error}')
         if abs(error) <= tolerance:
             print(f'Final load: {load}')
-            time.sleep(10)
+            time.sleep(3)
             break
         if prev_error is None:
             prev_error = error
@@ -52,7 +53,7 @@ for i in range(len(user_coords)):
         print(f'Correction: {correction}')
         instrument.move(motor=[4], dist=[round(correction)], override=True)
         prev_error = error
-        time.sleep(5)
+        time.sleep(3)
     instrument.moveTo(motor=[4], destination=[0])
 
 instrument.moveTo(motor=[2], destination=[0])

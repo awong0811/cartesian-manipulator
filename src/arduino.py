@@ -119,6 +119,8 @@ class Arduino():
         assert(max(motor)<=4)
         assert(max([abs(x) for x in dist])<=19000)
         for i in range(len(motor)):
+            if motor[i] == 4:
+                override = True
             distance = dist[i]
             # check position of motor
             pos = getattr(self, f'motor{motor[i]}')
@@ -209,11 +211,12 @@ class Arduino():
         response = self.read_response()
         for r in response:
             print(r)
-        user_input = input()
+        user_input = input() #weight measurement
         self.send_command(command=user_input)
         time.sleep(5)
         response = self.read_response()
         for r in response:
             print(r)
+        pos = getattr(self, 'motor4')
         self.moveTo(motor=[4], destination=[0])
-        return
+        return pos, user_input
