@@ -71,6 +71,9 @@ class Arduino():
             return False, 0
     
     def reset(self, motor: List):
+        '''
+        
+        '''
         assert(len(motor)<=4)
         assert(max(motor)<=4)
         assert(min(motor)>=0)
@@ -117,7 +120,7 @@ class Arduino():
         assert(len(motor)==len(dist))
         assert(len(motor)<=4)
         assert(max(motor)<=4)
-        assert(max([abs(x) for x in dist])<=19000)
+        # assert(max([abs(x) for x in dist])<=19000)
         for i in range(len(motor)):
             if motor[i] == 4:
                 override = True
@@ -219,4 +222,7 @@ class Arduino():
             print(r)
         pos = getattr(self, 'motor4')
         self.moveTo(motor=[4], destination=[0])
+        response = self.read_response()
+        if response:
+            print(response)
         return pos, user_input

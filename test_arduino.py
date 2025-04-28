@@ -1,15 +1,15 @@
 from src.arduino import Arduino
 import time
-from src.agilent54624A import Agilent54624A
+# from src.agilent54624A import Agilent54624A
 
 tolerance = 0.5
 target = 50
 kp, kd = 1/0.169, 0
 
 # Set up oscilloscope
-oscilloscope = Agilent54624A(port='COM1')
-oscilloscope.connect()
-oscilloscope.checkOperational()
+# oscilloscope = Agilent54624A(port='COM1')
+# oscilloscope.connect()
+# oscilloscope.checkOperational()
 
 # Set up arduino
 arduino = Arduino(port='COM16')
@@ -45,8 +45,8 @@ initial_guess = round(pos+kp*(float(weight) - target))
 for i in range(len(user_coords)):
     arduino.moveTo(motor=[2], destination=[user_coords[i]])
     arduino.move(motor=[4], dist=[initial_guess], override=True)
-    time.sleep(3)
     print(f'Initial load: {arduino.get_load()}')
+    time.sleep(5)
     prev_error = None
     while True:
         load = arduino.get_load()
@@ -63,8 +63,8 @@ for i in range(len(user_coords)):
         arduino.move(motor=[4], dist=[round(correction)], override=True)
         prev_error = error
         time.sleep(3)
-    oscilloscope.collect_datapoints('tx')
-    oscilloscope.collect_datapoints('rx')
+    # oscilloscope.collect_datapoints('tx')
+    # oscilloscope.collect_datapoints('rx')
     arduino.moveTo(motor=[4], destination=[0])
 
 arduino.moveTo(motor=[2], destination=[0])
@@ -81,5 +81,5 @@ arduino.moveTo(motor=[2], destination=[0])
 #     arduino.move([2],[1000])
 arduino.get_coords()
 
-oscilloscope.disconnect()
+# oscilloscope.disconnect()
 arduino.disconnect()
