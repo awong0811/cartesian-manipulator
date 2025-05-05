@@ -199,9 +199,11 @@ class Arduino():
         for r in response:
             print(r)
         user_input = input()
-        while user_input != 't':
+        while user_input != 't' and user_input != 's':
             user_input = input()
         self.send_command(command=user_input)
+        if user_input == 's':
+            return
         time.sleep(2)
         response = self.read_response()
         for r in response:
