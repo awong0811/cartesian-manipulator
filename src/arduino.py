@@ -72,7 +72,7 @@ class Arduino():
     
     def reset(self, motor: List):
         '''
-        
+        Resets motors to their respective 0 coordinates. Checks for switch presses.
         '''
         assert(len(motor)<=4)
         assert(max(motor)<=4)
@@ -116,6 +116,9 @@ class Arduino():
 
 
     def move(self, motor: List, dist: List, override=False):
+        '''
+        Sends a command to move a certain amount. This is additive to the current position.
+        '''
         command = ''
         assert(len(motor)==len(dist))
         assert(len(motor)<=4)
@@ -163,6 +166,9 @@ class Arduino():
         return dist
     
     def moveTo(self, motor: List, destination: List):
+        '''
+        Moves to a specified location. This will send the motor to a specific location.
+        '''
         coords = self.get_coords()
         dist = []
         for i,m in enumerate(motor):

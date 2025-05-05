@@ -6,6 +6,7 @@
 // Jimmy Huang
 // Anthony Wong
 
+#include <Servo.h>
 #include <AccelStepper.h>
 #include <HX711_ADC.h>
 #if defined(ESP8266) || defined(ESP32) || defined(AVR)
@@ -46,6 +47,7 @@ AccelStepper x1_stepper(AccelStepper::DRIVER, X1_PUL, X1_DIR);
 AccelStepper x2_stepper(AccelStepper::DRIVER, X2_PUL, X2_DIR);
 AccelStepper y_stepper(AccelStepper::DRIVER, Y_PUL, Y_DIR);
 AccelStepper z_stepper(AccelStepper::DRIVER, Z_PUL, Z_DIR);
+Servo myServo;
 
 //HX711 constructor:
 HX711_ADC LoadCell(HX711_dout, HX711_sck);
@@ -60,9 +62,9 @@ const int switchPin1 = 23;          // Pin connected to the NO switch, switch 1,
 const String outputSwitch1 = "S1";  // Character to output when switch 1 is pressed
 const int switchPin2 = 43;          // Switch 2, for motor x2
 const String outputSwitch2 = "S2";
-const int switchPin3 = 31; // Switch 3, for motor y
+const int switchPin3 = 31;  // Switch 3, for motor y
 const String outputSwitch3 = "S3";
-const int switchPin4 = 39; // Switch 4, for motor z
+const int switchPin4 = 39;  // Switch 4, for motor z
 const String outputSwitch4 = "S4";
 
 const int calVal_eepromAdress = 0;
@@ -70,7 +72,7 @@ unsigned long t = 0;
 bool calibrated = false;
 bool moved = false;
 unsigned long previousMillis = 0;  // Last time data was updated
-const long interval = 1000;  // 1 second (1000 milliseconds)
+const long interval = 1000;        // 1 second (1000 milliseconds)
 
 void setup() {
   // Set the control input rate
@@ -81,6 +83,9 @@ void setup() {
   pinMode(switchPin2, INPUT_PULLUP);
   pinMode(switchPin3, INPUT_PULLUP);
   pinMode(switchPin4, INPUT_PULLUP);
+
+  myServo.attach(7);
+  myServo.write(0);
 
   // Set the speeds for each motor
   x1_stepper.setMaxSpeed(500.0);
@@ -117,7 +122,7 @@ void loop() {
     Serial.println("***");
     Serial.println("Start calibration:");
     Serial.println("Remove any load applied to the load cell.");
-    Serial.println("Send 't' from serial monitor to set the tare offset.");
+    Serial.println("Send 't' from serial monitor to set the tare offset or 's' to skip the setup phase.");
 
     boolean _resume = false;
     while (_resume == false) {
@@ -126,6 +131,11 @@ void loop() {
         if (Serial.available() > 0) {
           char inByte = Serial.read();
           if (inByte == 't') LoadCell.tareNoDelay();
+          if (inByte == 's'){
+            Serial.println("Setup phase skipped.");
+            _resume = true;
+            calibrated = true;
+          }
         }
       }
       if (LoadCell.getTareStatus() == true) {
@@ -133,6 +143,8 @@ void loop() {
         _resume = true;
       }
     }
+    if (calibrated) //skip setup phase
+      break;
 
     Serial.println("Now, move the transducer to the scale until a suitable weight is measured. Type 'd' when done.");
 
@@ -196,7 +208,7 @@ void loop() {
   if (LoadCell.update()) newDataReady = true;
 
   if (millis() - previousMillis >= interval) {  // If 1 second has passed
-    previousMillis = millis();  // Save the current time
+    previousMillis = millis();                  // Save the current time
 
     // Update the load cell and get the new data
     if (LoadCell.update()) {
@@ -340,6 +352,23 @@ void loop() {
           y_stepper.move(PARAM1);
         }
       }
+    } else if (in == 'W') {
+      
+      myServo.write(180);
+      delay(2000);
+      x2_stepper.move(-100);  // Set the target move
+      // Keep running the stepper until it reaches the target
+      while (x2_stepper.distanceToGo() != 0) {
+        x2_stepper.run();
+      }
+      myServo.write(0);
+      x2_stepper.move(100);
+      while (x2_stepper.distanceToGo() != 0) {
+        x2_stepper.run();
+      }
+      // After the stepper is finished, move the servo instantly
+      
+      
     }
   }
 }
