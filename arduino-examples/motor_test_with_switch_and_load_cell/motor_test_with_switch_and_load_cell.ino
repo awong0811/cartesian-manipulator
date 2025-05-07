@@ -17,7 +17,7 @@
 // CONSTANT DEFINITIONS
 //
 #define SERIAL_STALL 10  //ms
-
+#define servo_start_pos 90
 //
 // PIN NUMBERS
 //
@@ -85,7 +85,10 @@ void setup() {
   pinMode(switchPin4, INPUT_PULLUP);
 
   myServo.attach(7);
-  myServo.write(0);
+  // for (int i = 0; i<servo_start_pos; i++){
+  //   myServo.write(i);
+  //   delay(50);
+  // }
 
   // Set the speeds for each motor
   x1_stepper.setMaxSpeed(500.0);
@@ -353,16 +356,23 @@ void loop() {
         }
       }
     } else if (in == 'W') {
-      
-      myServo.write(180);
+      for (int i = servo_start_pos; i > 3; i--){
+        myServo.write(i);
+        i--;
+        delay(50);
+      }
       delay(2000);
-      x2_stepper.move(-100);  // Set the target move
+      x2_stepper.move(-500);  // Set the target move
       // Keep running the stepper until it reaches the target
       while (x2_stepper.distanceToGo() != 0) {
         x2_stepper.run();
       }
-      myServo.write(0);
-      x2_stepper.move(100);
+      for (int i = 3; i<servo_start_pos; i++){
+        myServo.write(i);
+        i++;
+        delay(50);
+      }
+      x2_stepper.move(500);
       while (x2_stepper.distanceToGo() != 0) {
         x2_stepper.run();
       }
