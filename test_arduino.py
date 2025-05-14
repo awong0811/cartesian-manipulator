@@ -4,7 +4,7 @@ import time
 
 tolerance = 0.5
 target = 50
-kp, kd = 1/0.169, 0
+kp, kd = 1/0.0425, 0
 
 # Set up oscilloscope
 # oscilloscope = Agilent54624A(port='COM1')
@@ -65,6 +65,8 @@ for i in range(len(user_coords)):
         time.sleep(3)
     # oscilloscope.collect_datapoints('tx')
     # oscilloscope.collect_datapoints('rx')
+    arduino.move(motor=[4], dist=[2000])
+    arduino.wipe()
     arduino.moveTo(motor=[4], destination=[0])
 
 arduino.moveTo(motor=[2], destination=[0])

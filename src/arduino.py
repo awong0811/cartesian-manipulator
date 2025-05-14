@@ -181,7 +181,7 @@ class Arduino():
         Performs wipe using X2 motor.
         '''
         self.send_command(command='W')
-        time.sleep(10)
+        time.sleep(13)
         return
 
     def get_load(self):
