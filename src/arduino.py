@@ -176,6 +176,14 @@ class Arduino():
         dist = self.move(motor=motor, dist=dist)
         return dist
 
+    def wipe(self):
+        '''
+        Performs wipe using X2 motor.
+        '''
+        self.send_command(command='W')
+        time.sleep(10)
+        return
+
     def get_load(self):
         self.send_command(command='l')
         time.sleep(0.5)

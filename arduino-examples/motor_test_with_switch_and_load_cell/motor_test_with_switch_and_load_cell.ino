@@ -363,13 +363,19 @@ void loop() {
         }
       }
     } else if (in == 'W') {
+      int move_back = 1800;
+      int wipe_distance = 600;
+      x2_stepper.move(move_back);
+      while (x2_stepper.distanceToGo() != 0) {
+        x2_stepper.run();
+      }
       for (int i = servo_start_pos; i > servo_end_pos; i--){
         myServo.write(i);
         i--;
         delay(50);
       }
       delay(2000);
-      x2_stepper.move(-750);  // Set the target move
+      x2_stepper.move(-1*wipe_distance);  // Set the target move
       // Keep running the stepper until it reaches the target
       while (x2_stepper.distanceToGo() != 0) {
         x2_stepper.run();
@@ -380,7 +386,7 @@ void loop() {
       //   i++;
       //   delay(50);
       // }
-      x2_stepper.move(750);
+      x2_stepper.move(wipe_distance-move_back);
       while (x2_stepper.distanceToGo() != 0) {
         x2_stepper.run();
       }

@@ -25,7 +25,7 @@ response = arduino.read_response()
 print(response)
 
 ################################
-# arduino.reset([1,2,3])
+arduino.reset([2])
 ################################
 
 print("Specify 5 coordinates, separated by spaces: ")
