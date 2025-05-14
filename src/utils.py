@@ -1,1 +1,35 @@
-import pandas
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import os
+
+def get_user_coordinates(file_path: str):
+    try:
+        column_index = 0
+        # Load the spreadsheet into a pandas DataFrame
+        df = pd.read_excel(file_path, header=None) if file_path.endswith('.xlsx') else pd.read_csv(file_path, header=None)
+        
+        # Extract the specified column as a list
+        coordinates = df.iloc[:, column_index].tolist()
+        
+        # Return the cleaned list, ignoring any NaNs
+        return [coord for coord in coordinates if pd.notna(coord)]
+    
+    except Exception as e:
+        print(f"Error loading coordinates: {e}")
+        return []
+
+def save_data(output_folder: str, file_name: str, datapoints, sheet_name='Datapoints'):
+    if not isinstance(datapoints, (list, np.ndarray)):
+        raise ValueError("Variable datapoints needs to be a list or a numpy array.")
+    if isinstance(datapoints, list):
+        datapoints = np.array(datapoints)
+    os.makedirs(output_folder, exist_ok=True)
+    file_path = os.path.join(output_folder, file_name)
+    _, extension = os.path.splitext(file_name)
+    if extension == '.xlsx':
+        # Convert to pandas dataframe
+        df = pd.DataFrame(datapoints, columns=["Datapoints"])
+        # Save to .xlsx file
+        df.to_excel(file_path, index=False, sheet_name=sheet_name)
+    return
