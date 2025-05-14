@@ -6,5 +6,8 @@ dependencies:
   - pip
   - pip:
     - pymeasure
-    - pyserial
+    - pyserial # added new libraries below
     - pandas
+    - numpy
+    - scipy
+    - matplotlib
