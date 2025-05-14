@@ -7,7 +7,7 @@ def get_user_coordinates(file_path: str):
     try:
         column_index = 0
         # Load the spreadsheet into a pandas DataFrame
-        df = pd.read_excel(file_path, header=None) if file_path.endswith('.xlsx') else pd.read_csv(file_path, header=None)
+        df = pd.read_excel(file_path, sheet_name='Coordinates', header=None) if file_path.endswith('.xlsx') else pd.read_csv(file_path, header=None)
         
         # Extract the specified column as a list
         coordinates = df.iloc[:, column_index].tolist()
