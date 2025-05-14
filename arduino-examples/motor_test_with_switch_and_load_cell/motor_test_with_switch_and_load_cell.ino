@@ -17,7 +17,8 @@
 // CONSTANT DEFINITIONS
 //
 #define SERIAL_STALL 10  //ms
-#define servo_start_pos 90
+#define servo_start_pos 45
+#define servo_end_pos 6
 //
 // PIN NUMBERS
 //
@@ -32,6 +33,9 @@
 
 #define Z_PUL 10
 #define Z_DIR 11
+
+const int motorPin1 = 12; // peristaltic pump
+const int motorPin2 = 13;
 
 const int HX711_dout = 32;  //mcu > HX711 dout pin
 const int HX711_sck = 30;   //mcu > HX711 sck pin
@@ -89,6 +93,9 @@ void setup() {
   //   myServo.write(i);
   //   delay(50);
   // }
+
+  pinMode(motorPin1, OUTPUT);
+  pinMode(motorPin2, OUTPUT);
 
   // Set the speeds for each motor
   x1_stepper.setMaxSpeed(500.0);
@@ -356,30 +363,45 @@ void loop() {
         }
       }
     } else if (in == 'W') {
-      for (int i = servo_start_pos; i > 3; i--){
+      for (int i = servo_start_pos; i > servo_end_pos; i--){
         myServo.write(i);
         i--;
         delay(50);
       }
       delay(2000);
-      x2_stepper.move(-500);  // Set the target move
+      x2_stepper.move(-750);  // Set the target move
       // Keep running the stepper until it reaches the target
       while (x2_stepper.distanceToGo() != 0) {
         x2_stepper.run();
       }
-      for (int i = 3; i<servo_start_pos; i++){
-        myServo.write(i);
-        i++;
-        delay(50);
-      }
-      x2_stepper.move(500);
+      myServo.write(servo_start_pos);
+      // for (int i = 5; i<servo_start_pos; i++){
+      //   myServo.write(i);
+      //   i++;
+      //   delay(50);
+      // }
+      x2_stepper.move(750);
       while (x2_stepper.distanceToGo() != 0) {
         x2_stepper.run();
       }
-      // After the stepper is finished, move the servo instantly
-      
-      
-    }
+      } else if (in == 'D') {
+          if (getCommand()) {
+            if (CMD == '+') {
+              analogWrite(motorPin1, 255); // forward
+              digitalWrite(motorPin2, LOW);
+              delay(abs(PARAM1));
+              digitalWrite(motorPin1, LOW);
+              digitalWrite(motorPin2, LOW);
+            }
+            else if (CMD == '-') {
+              analogWrite(motorPin2, 255); // reverse
+              digitalWrite(motorPin1, LOW);
+              delay(abs(PARAM1));
+              digitalWrite(motorPin1, LOW);
+              digitalWrite(motorPin2, LOW);
+            }
+          }
+        }
   }
 }
 // Wait for message from PC or timeout
