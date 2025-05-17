@@ -10,10 +10,10 @@ instrument.connect()
 instrument.setup()
 while True:
     user_input = input()
-    if user_input == int(user_input):
-        instrument.move(motor=[4], dist=[user_input], override=True)
-    elif isinstance(user_input, str):
+    if isinstance(user_input, str):
         try:
+            if user_input == 'q':
+                exit()
             instrument.send_command(user_input)
         except ValueError:
             print("Not a valid input.")

@@ -2,7 +2,7 @@ from src.arduino import Arduino
 import time
 # from src.agilent54624A import Agilent54624A
 
-tolerance = 0.5
+tolerance = 1
 target = 50
 kp, kd = 1/0.169, 0
 

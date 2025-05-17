@@ -4,10 +4,10 @@ from src.agilent54624A import Agilent54624A
 from src.utils import *
 import argparse
 
-tolerance = 0.5
+tolerance = 1
 target = 50
 kp, kd = 1/0.0425, 0
-dip_station_coord = 2075
+dip_station_coord = 2050
 
 parser = argparse.ArgumentParser(description="Process two file paths.")
 parser.add_argument("input_file", type=str, help="Path to the input file")
@@ -65,17 +65,6 @@ for i in range(len(user_coords)):
     arduino.moveTo(motor=[4], destination=[0])
 
 arduino.moveTo(motor=[2], destination=[0])
-
-
-# arduino.move(motor=[2, 3], dist=[2000, 1000], override=True)
-# arduino.move(motor=[1,2,3],dist=[2000,3000,-5000],override=True)
-# arduino.move(motor=[1,2], dist=[2000,1000])
-# arduino.move(motor=[1,2], dist=[1000,2000])
-# arduino.move(motor=[3],dist=[5000],override=True)
-# arduino.reset([1,2])
-# for i in range(3):
-#     arduino.move([1],[1000])
-#     arduino.move([2],[1000])
 arduino.get_coords()
 
 # oscilloscope.disconnect()

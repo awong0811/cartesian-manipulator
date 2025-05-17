@@ -62,9 +62,9 @@ HX711_ADC LoadCell(HX711_dout, HX711_sck);
 char CMD;
 long PARAM1;
 float i = 0;
-const int switchPin1 = 23;          // Pin connected to the NO switch, switch 1, for motor x1
+const int switchPin1 = 43;          // Pin connected to the NO switch, switch 1, for motor x1
 const String outputSwitch1 = "S1";  // Character to output when switch 1 is pressed
-const int switchPin2 = 43;          // Switch 2, for motor x2
+const int switchPin2 = 23;          // Switch 2, for motor x2
 const String outputSwitch2 = "S2";
 const int switchPin3 = 31;  // Switch 3, for motor y
 const String outputSwitch3 = "S3";

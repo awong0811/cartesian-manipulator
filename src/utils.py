@@ -13,7 +13,7 @@ def get_user_coordinates(file_path: str):
         coordinates = df.iloc[:, column_index].tolist()
         
         # Return the cleaned list, ignoring any NaNs
-        return [coord for coord in coordinates if pd.notna(coord)]
+        return [int(coord) for coord in coordinates if pd.notna(coord)]
     
     except Exception as e:
         print(f"Error loading coordinates: {e}")
