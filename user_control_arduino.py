@@ -10,8 +10,11 @@ instrument.connect()
 instrument.setup()
 while True:
     user_input = input()
-    try:
-        user_input = int(user_input)
-    except ValueError:
-        print("Not a valid integer.")
-    instrument.move(motor=[4], dist=[user_input], override=True)
+    if user_input == int(user_input):
+        instrument.move(motor=[4], dist=[user_input], override=True)
+    elif isinstance(user_input, str):
+        try:
+            instrument.send_command(user_input)
+        except ValueError:
+            print("Not a valid input.")
+    

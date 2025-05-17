@@ -7,19 +7,20 @@ import argparse
 tolerance = 0.5
 target = 50
 kp, kd = 1/0.0425, 0
+dip_station_coord = 2075
 
 parser = argparse.ArgumentParser(description="Process two file paths.")
 parser.add_argument("input_file", type=str, help="Path to the input file")
 parser.add_argument("output_file", type=str, help="Path to the output file")
 
 args = parser.parse_args()
-user_coords = args.input_file
+user_coords = get_user_coordinates(args.input_file)
 output_file = args.output_file
 
 # Set up oscilloscope
-oscilloscope = Agilent54624A(port='COM1')
-oscilloscope.connect()
-oscilloscope.checkOperational()
+# oscilloscope = Agilent54624A(port='COM1')
+# oscilloscope.connect()
+# oscilloscope.checkOperational()
 
 # Set up arduino
 arduino = Arduino(port='COM16')
@@ -52,11 +53,13 @@ print(f"Number of coordinates received: {len(user_coords)}")
 pos, weight = boundary_condition
 initial_guess = round(pos+kp*(float(weight) - target))
 for i in range(len(user_coords)):
+    arduino.dip(dip_station_coord, initial_guess, target, tolerance, kp, kd)
     arduino.moveTo(motor=[2], destination=[user_coords[i]])
-    controller(initial_guess, target)
-    datapoints_tx = oscilloscope.collect_datapoints('tx')
-    datapoints_rx = oscilloscope.collect_datapoints('rx')
-    datapoints = np.vstack([np.array(datapoints_tx), np.array(datapoints_rx)]).T
+    arduino.controller(initial_guess, target, tolerance, kp, kd)
+    # datapoints_tx = oscilloscope.collect_datapoints('tx')
+    # datapoints_rx = oscilloscope.collect_datapoints('rx')
+    # datapoints = np.vstack([np.array(datapoints_tx), np.array(datapoints_rx)]).T
+    # save_data(output_file, datapoints)
     arduino.move(motor=[4], dist=[2000])
     arduino.wipe()
     arduino.moveTo(motor=[4], destination=[0])
@@ -75,5 +78,5 @@ arduino.moveTo(motor=[2], destination=[0])
 #     arduino.move([2],[1000])
 arduino.get_coords()
 
-oscilloscope.disconnect()
+# oscilloscope.disconnect()
 arduino.disconnect()

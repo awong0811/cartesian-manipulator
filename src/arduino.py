@@ -263,3 +263,10 @@ class Arduino():
             self.move(motor=[4], dist=[round(correction)], override=True)
             prev_error = error
             time.sleep(3)
+        return
+    
+    def dip(self, dip_station_coord, initial_guess, target, tolerance, kp, kd):
+        self.moveTo(motor=[2], destination=[dip_station_coord])
+        self.controller(initial_guess, target, tolerance, kp, kd)
+        self.moveTo(motor=[4], destination=[0])
+        return
