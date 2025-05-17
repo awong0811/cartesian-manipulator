@@ -242,3 +242,24 @@ class Arduino():
         if response:
             print(response)
         return pos, user_input
+    
+    def controller(self, initial_guess, target, tolerance, kp, kd):
+        self.move(motor=[4], dist=[initial_guess], override=True)
+        print(f'Initial load: {self.get_load()}')
+        time.sleep(5)
+        prev_error = None
+        while True:
+            load = self.get_load()
+            error = load - target
+            print(f'Load: {load}, Error: {error}')
+            if abs(error) <= tolerance:
+                print(f'Final load: {load}')
+                time.sleep(3)
+                break
+            if prev_error is None:
+                prev_error = error
+            correction = error*kp + kd*(error-prev_error)
+            print(f'Correction: {correction}')
+            self.move(motor=[4], dist=[round(correction)], override=True)
+            prev_error = error
+            time.sleep(3)

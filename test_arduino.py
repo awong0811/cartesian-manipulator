@@ -8,6 +8,14 @@ tolerance = 0.5
 target = 50
 kp, kd = 1/0.0425, 0
 
+parser = argparse.ArgumentParser(description="Process two file paths.")
+parser.add_argument("input_file", type=str, help="Path to the input file")
+parser.add_argument("output_file", type=str, help="Path to the output file")
+
+args = parser.parse_args()
+user_coords = args.input_file
+output_file = args.output_file
+
 # Set up oscilloscope
 oscilloscope = Agilent54624A(port='COM1')
 oscilloscope.connect()
@@ -26,14 +34,16 @@ time.sleep(0.5)
 response = arduino.read_response()
 print(response)
 
-################################
+# Reset motors
 arduino.reset([2])
-################################
 
-print("Specify 5 coordinates, separated by spaces: ")
-user_input = input()
-user_coords = user_input.split()
-user_coords = list(map(int, user_coords))
+# Enter user-specified coordinates
+
+# print("Specify 5 coordinates, separated by spaces: ")
+# user_input = input()
+# user_coords = user_input.split()
+# user_coords = list(map(int, user_coords))
+
 print(f"Number of coordinates received: {len(user_coords)}")
 
 ##############################################################################
@@ -43,27 +53,10 @@ pos, weight = boundary_condition
 initial_guess = round(pos+kp*(float(weight) - target))
 for i in range(len(user_coords)):
     arduino.moveTo(motor=[2], destination=[user_coords[i]])
-    arduino.move(motor=[4], dist=[initial_guess], override=True)
-    print(f'Initial load: {arduino.get_load()}')
-    time.sleep(5)
-    prev_error = None
-    while True:
-        load = arduino.get_load()
-        error = load - target
-        print(f'Load: {load}, Error: {error}')
-        if abs(error) <= tolerance:
-            print(f'Final load: {load}')
-            time.sleep(3)
-            break
-        if prev_error is None:
-            prev_error = error
-        correction = error*kp + kd*(error-prev_error)
-        print(f'Correction: {correction}')
-        arduino.move(motor=[4], dist=[round(correction)], override=True)
-        prev_error = error
-        time.sleep(3)
+    controller(initial_guess, target)
     datapoints_tx = oscilloscope.collect_datapoints('tx')
     datapoints_rx = oscilloscope.collect_datapoints('rx')
+    datapoints = np.vstack([np.array(datapoints_tx), np.array(datapoints_rx)]).T
     arduino.move(motor=[4], dist=[2000])
     arduino.wipe()
     arduino.moveTo(motor=[4], destination=[0])
