@@ -19,9 +19,8 @@ def get_user_coordinates(file_path: str):
         print(f"Error loading coordinates: {e}")
         return []
 
-def save_data(file_path: str, datapoints, 
-              sheet_name='Datapoints', 
-              columns=["TX", "RX"]):
+def save_data(file_path: str, columns: list, datapoints,
+              sheet_name='Datapoints'):
     if not isinstance(datapoints, (list, np.ndarray)):
         raise ValueError("Variable datapoints needs to be a list or a numpy array.")
     if isinstance(datapoints, list):
@@ -34,7 +33,7 @@ def save_data(file_path: str, datapoints,
     _, extension = os.path.splitext(file_name)
     if extension == '.xlsx':
         # Convert to pandas dataframe
-        df = pd.DataFrame(datapoints, columns=["TX", "RX"])
+        df = pd.DataFrame(datapoints, columns=columns)
         try:
             # Read the existing file
             with pd.ExcelFile(file_path) as existing_file:

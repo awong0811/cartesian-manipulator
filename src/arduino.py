@@ -254,8 +254,9 @@ class Arduino():
             print(f'Load: {load}, Error: {error}')
             if abs(error) <= tolerance:
                 print(f'Final load: {load}')
+                pos = getattr(self, 'motor4')
                 time.sleep(3)
-                break
+                return pos
             if prev_error is None:
                 prev_error = error
             correction = error*kp + kd*(error-prev_error)
@@ -263,10 +264,9 @@ class Arduino():
             self.move(motor=[4], dist=[round(correction)], override=True)
             prev_error = error
             time.sleep(3)
-        return
     
     def dip(self, dip_station_coord, initial_guess, target, tolerance, kp, kd):
         self.moveTo(motor=[2], destination=[dip_station_coord])
-        self.controller(initial_guess, target, tolerance, kp, kd)
+        pos = self.controller(initial_guess, target, tolerance, kp, kd)
         self.moveTo(motor=[4], destination=[0])
-        return
+        return pos

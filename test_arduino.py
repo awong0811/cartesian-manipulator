@@ -52,14 +52,22 @@ print(f"Number of coordinates received: {len(user_coords)}")
 ##############################################################################
 pos, weight = boundary_condition
 initial_guess = round(pos+kp*(float(weight) - target))
+dip_pos = None
+plate_pos = None
 for i in range(len(user_coords)):
-    arduino.dip(dip_station_coord, initial_guess, target, tolerance, kp, kd)
+    if dip_pos is None:
+        dip_pos = initial_guess
+    if plate_pos is None:
+        plate_pos = initial_guess
+    dip_pos = arduino.dip(dip_station_coord, dip_pos, target, tolerance, kp, kd)
     arduino.moveTo(motor=[2], destination=[user_coords[i]])
-    arduino.controller(initial_guess, target, tolerance, kp, kd)
+    plate_pos = arduino.controller(plate_pos, target, tolerance, kp, kd)
     # datapoints_tx = oscilloscope.collect_datapoints('tx')
     # datapoints_rx = oscilloscope.collect_datapoints('rx')
-    # datapoints = np.vstack([np.array(datapoints_tx), np.array(datapoints_rx)]).T
-    # save_data(output_file, datapoints)
+    # if i < 1:
+    #     datapoints = np.vstack([np.array(datapoints_tx), np.array(datapoints_rx)])
+    # else:
+    #     datapoints = np.vstack([datapoints, np.array(datapoints_tx), np.array(datapoints_rx)])
     arduino.move(motor=[4], dist=[2000])
     arduino.wipe()
     arduino.moveTo(motor=[4], destination=[0])
@@ -67,5 +75,8 @@ for i in range(len(user_coords)):
 arduino.moveTo(motor=[2], destination=[0])
 arduino.get_coords()
 
+# datapoints = datapoints.T
+# columns = [f"{'TX' if i % 2 == 0 else 'RX'}{i // 2 + 1}" for i in range(datapoints.shape[1])]
+# save_data(output_file, columns=columns, datapoints=datapoints)
 # oscilloscope.disconnect()
 arduino.disconnect()
