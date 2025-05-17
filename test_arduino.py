@@ -1,15 +1,17 @@
 from src.arduino import Arduino
 import time
-# from src.agilent54624A import Agilent54624A
+from src.agilent54624A import Agilent54624A
+from src.utils import *
+import argparse
 
 tolerance = 0.5
 target = 50
 kp, kd = 1/0.0425, 0
 
 # Set up oscilloscope
-# oscilloscope = Agilent54624A(port='COM1')
-# oscilloscope.connect()
-# oscilloscope.checkOperational()
+oscilloscope = Agilent54624A(port='COM1')
+oscilloscope.connect()
+oscilloscope.checkOperational()
 
 # Set up arduino
 arduino = Arduino(port='COM16')
@@ -33,9 +35,6 @@ user_input = input()
 user_coords = user_input.split()
 user_coords = list(map(int, user_coords))
 print(f"Number of coordinates received: {len(user_coords)}")
-
-# arduino.move(motor=[2],dist=[200])
-# arduino.moveTo(motor=[2], destination=[0])
 
 ##############################################################################
 # Measurement loop
@@ -63,8 +62,8 @@ for i in range(len(user_coords)):
         arduino.move(motor=[4], dist=[round(correction)], override=True)
         prev_error = error
         time.sleep(3)
-    # oscilloscope.collect_datapoints('tx')
-    # oscilloscope.collect_datapoints('rx')
+    datapoints_tx = oscilloscope.collect_datapoints('tx')
+    datapoints_rx = oscilloscope.collect_datapoints('rx')
     arduino.move(motor=[4], dist=[2000])
     arduino.wipe()
     arduino.moveTo(motor=[4], destination=[0])
@@ -83,5 +82,5 @@ arduino.moveTo(motor=[2], destination=[0])
 #     arduino.move([2],[1000])
 arduino.get_coords()
 
-# oscilloscope.disconnect()
+oscilloscope.disconnect()
 arduino.disconnect()

@@ -183,5 +183,5 @@ class Agilent54624A():
                 raise ValueError("channel must be chosen from [1, 2, 3, 4].")
         self.select_channel(channel)
         self.set_waveform_type("WORD")
-        self.retrieve_data("WORD")
-        return
+        datapoints = self.retrieve_data()
+        return datapoints
