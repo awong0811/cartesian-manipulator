@@ -8,6 +8,7 @@ tolerance = 1
 target = 50
 kp, kd = 1/0.0425, 0
 dip_station_coord = 2050
+couplant_increment = 50
 
 parser = argparse.ArgumentParser(description="Process two file paths.")
 parser.add_argument("input_file", type=str, help="Path to the input file")
@@ -15,6 +16,7 @@ parser.add_argument("output_file", type=str, help="Path to the output file")
 
 args = parser.parse_args()
 user_coords = get_user_coordinates(args.input_file)
+print(f"Number of coordinates received: {len(user_coords)}")
 output_file = args.output_file
 
 # Set up oscilloscope
@@ -38,15 +40,6 @@ print(response)
 # Reset motors
 arduino.reset([2])
 
-# Enter user-specified coordinates
-
-# print("Specify 5 coordinates, separated by spaces: ")
-# user_input = input()
-# user_coords = user_input.split()
-# user_coords = list(map(int, user_coords))
-
-print(f"Number of coordinates received: {len(user_coords)}")
-
 ##############################################################################
 # Measurement loop
 ##############################################################################
@@ -59,15 +52,19 @@ for i in range(len(user_coords)):
         dip_pos = initial_guess
     if plate_pos is None:
         plate_pos = initial_guess
+    arduino.pump_couplant(amount=couplant_increment)
     dip_pos = arduino.dip(dip_station_coord, dip_pos, target, tolerance, kp, kd)
     arduino.moveTo(motor=[2], destination=[user_coords[i]])
     plate_pos = arduino.controller(plate_pos, target, tolerance, kp, kd)
+
+    # Capture the datapoints from the transmitter and receiver from the oscilloscope
     # datapoints_tx = oscilloscope.collect_datapoints('tx')
     # datapoints_rx = oscilloscope.collect_datapoints('rx')
     # if i < 1:
     #     datapoints = np.vstack([np.array(datapoints_tx), np.array(datapoints_rx)])
     # else:
     #     datapoints = np.vstack([datapoints, np.array(datapoints_tx), np.array(datapoints_rx)])
+
     arduino.move(motor=[4], dist=[2000])
     arduino.wipe()
     arduino.moveTo(motor=[4], destination=[0])

@@ -209,7 +209,7 @@ void loop() {
     LoadCell.setCalFactor(newCalibrationValue);
     Serial.print("New calibration value has been set to: ");
     Serial.println(newCalibrationValue);
-    Serial.println("Setup complete!");
+    Serial.println("Load cell calibration complete!");
     calibrated = true;
   }
   static boolean newDataReady = 0;

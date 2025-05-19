@@ -201,6 +201,14 @@ class Arduino():
             print(f"Motor {i+1}: {coord}")
         return coords
     
+    def pump_couplant(self, amount):
+        if amount >= 0:
+            sign = '+'
+        else:
+            sign = '-'
+        self.send_command(command=f'D{sign}{abs(int(amount))}')
+        return
+
     def setup(self):
         time.sleep(5)
         response = self.read_response()
@@ -241,6 +249,21 @@ class Arduino():
         response = self.read_response()
         if response:
             print(response)
+
+        # added pump calibration
+        print("Set the desired level of the couplant in the dip station. Simply enter an integer, positive(to pump more) or negative (to remove). Enter 'd' when done.")
+        while True:
+            user_input = input()
+            if user_input == 'd':
+                self.send_command(command=user_input)
+                break
+            try:
+                user_input = int(user_input)
+            except ValueError:
+                print("Not a valid integer.")
+            self.pump_couplant(amount=user_input)
+        print('Couplant level adjustment complete.')
+
         return pos, user_input
     
     def controller(self, initial_guess, target, tolerance, kp, kd):
