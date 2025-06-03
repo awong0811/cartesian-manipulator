@@ -253,15 +253,14 @@ class Arduino():
         # added pump calibration
         print("Set the desired level of the couplant in the dip station. Simply enter an integer, positive(to pump more) or negative (to remove). Enter 'd' when done.")
         while True:
-            user_input = input()
-            if user_input == 'd':
-                self.send_command(command=user_input)
+            user_input_pump = input()
+            if user_input_pump == 'd':
                 break
             try:
-                user_input = int(user_input)
+                user_input_pump = int(user_input_pump)
             except ValueError:
                 print("Not a valid integer.")
-            self.pump_couplant(amount=user_input)
+            self.pump_couplant(amount=user_input_pump)
         print('Couplant level adjustment complete.')
 
         return pos, user_input
