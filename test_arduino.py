@@ -7,7 +7,7 @@ import argparse
 tolerance = 1
 target = 50
 kp, kd = 1/0.0425, 0
-dip_station_coord = 2050
+dip_station_coord = 2090
 couplant_increment = 50
 vertical_offset = 22000 # between load cell and plate
 
