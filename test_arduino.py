@@ -9,6 +9,7 @@ target = 50
 kp, kd = 1/0.0425, 0
 dip_station_coord = 2050
 couplant_increment = 50
+vertical_offset = 22000 # between load cell and plate
 
 parser = argparse.ArgumentParser(description="Process two file paths.")
 parser.add_argument("input_file", type=str, help="Path to the input file")
@@ -44,7 +45,7 @@ arduino.reset([2])
 # Measurement loop
 ##############################################################################
 pos, weight = boundary_condition
-initial_guess = round(pos+kp*(float(weight) - target))
+initial_guess = round(pos+kp*(float(weight) - target)) - vertical_offset
 dip_pos = None
 plate_pos = None
 for i in range(len(user_coords)):

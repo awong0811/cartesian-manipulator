@@ -114,6 +114,13 @@ class Arduino():
         print("All motors reset!")
         return None
 
+    def wait(self, dist):
+        dist = int(dist)
+        if 1 <= dist <= 4:
+            return 2.5 + (dist - 1) * 0.5
+        elif 15 <= dist:
+            return dist*1.3
+
 
     def move(self, motor: List, dist: List, override=False):
         '''
@@ -162,7 +169,8 @@ class Arduino():
                 setattr(self, f'motor{motor[i]}', destination)
         self.send_command(command=command[1:])
         # wait for all the motors for finish moving
-        time.sleep(config.wait_times[max([abs(x) for x in dist])//1000+1])
+        time.sleep(self.wait(max([abs(x) for x in dist])//1000+1))
+        # time.sleep(config.wait_times[max([abs(x) for x in dist])//1000+1])
         return dist
     
     def moveTo(self, motor: List, destination: List):
