@@ -13,20 +13,24 @@ vertical_offset = 22000 # between load cell and plate
 
 parser = argparse.ArgumentParser(description="Process two file paths.")
 parser.add_argument("input_file", type=str, help="Path to the input file")
-parser.add_argument("output_file", type=str, help="Path to the output file")
+parser.add_argument("output_file", type=str, nargs='?', default=None, help="Path to the output file")
 
 args = parser.parse_args()
 user_coords = get_user_coordinates(args.input_file)
 print(f"Number of coordinates received: {len(user_coords)}")
-output_file = args.output_file
+if args.output_file is None:
+    output_file = args.input_file
+else:
+    output_file = args.output_file
 
-# Set up oscilloscope
+############ Set up oscilloscope ####################
 # oscilloscope = Agilent54624A(port='COM1')
 # oscilloscope.connect()
 # oscilloscope.checkOperational()
+#####################################################
 
 # Set up arduino
-arduino = Arduino(port='COM16')
+arduino = Arduino(port='COM7')
 arduino.connect()
 boundary_condition = arduino.setup()
 arduino.send_command(command='X1?')
@@ -65,6 +69,7 @@ for i in range(len(user_coords)):
     #     datapoints = np.vstack([np.array(datapoints_tx), np.array(datapoints_rx)])
     # else:
     #     datapoints = np.vstack([datapoints, np.array(datapoints_tx), np.array(datapoints_rx)])
+    #################################################################################
 
     arduino.move(motor=[4], dist=[2000])
     arduino.wipe()
@@ -73,8 +78,11 @@ for i in range(len(user_coords)):
 arduino.moveTo(motor=[2], destination=[0])
 arduino.get_coords()
 
+################# uncomment if using oscilloscope ##############################################
 # datapoints = datapoints.T
 # columns = [f"{'TX' if i % 2 == 0 else 'RX'}{i // 2 + 1}" for i in range(datapoints.shape[1])]
 # save_data(output_file, columns=columns, datapoints=datapoints)
 # oscilloscope.disconnect()
+################################################################################################
+
 arduino.disconnect()

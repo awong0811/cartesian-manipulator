@@ -116,7 +116,7 @@ class Arduino():
 
     def wait(self, dist):
         dist = int(dist)
-        if 1 <= dist <= 4:
+        if 1 <= dist <= 14:
             return 2.5 + (dist - 1) * 0.5
         elif 15 <= dist:
             return dist*1.3
