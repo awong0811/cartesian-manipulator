@@ -49,14 +49,14 @@ arduino.reset([2])
 # Measurement loop
 ##############################################################################
 pos, weight = boundary_condition
-initial_guess = round(pos+kp*(float(weight) - target)) - vertical_offset
+initial_guess = round(pos+kp*(float(weight) - target))
 dip_pos = None
 plate_pos = None
 for i in range(len(user_coords)):
     if dip_pos is None:
         dip_pos = initial_guess
     if plate_pos is None:
-        plate_pos = initial_guess
+        plate_pos = initial_guess - vertical_offset
     arduino.pump_couplant(amount=couplant_increment)
     dip_pos = arduino.dip(dip_station_coord, dip_pos, target, tolerance, kp, kd)
     arduino.moveTo(motor=[2], destination=[user_coords[i]])
@@ -69,6 +69,10 @@ for i in range(len(user_coords)):
     #     datapoints = np.vstack([np.array(datapoints_tx), np.array(datapoints_rx)])
     # else:
     #     datapoints = np.vstack([datapoints, np.array(datapoints_tx), np.array(datapoints_rx)])
+    # datapoints = datapoints.T
+    # columns = [f"{'TX' if i % 2 == 0 else 'RX'}{i // 2 + 1}" for i in range(datapoints.shape[1])]
+    # save_data(output_file, columns=columns, datapoints=datapoints)
+    # datapoints = datapoints.T
     #################################################################################
 
     arduino.move(motor=[4], dist=[2000])

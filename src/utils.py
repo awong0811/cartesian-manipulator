@@ -25,7 +25,8 @@ def save_data(file_path: str, columns: list, datapoints,
         raise ValueError("Variable datapoints needs to be a list or a numpy array.")
     if isinstance(datapoints, list):
         datapoints = np.array(datapoints)
-    if datapoints.shape[-1] != 2 or len(datapoints.shape) != 2:
+    if datapoints.shape[-1]%2 != 0 or len(datapoints.shape) != 2:
+        print(f'datapoints is shape {datapoints.shape}')
         raise ValueError("Datapoints must be an Nx2 array.")
     output_folder, file_name = os.path.split(file_path)
     os.makedirs(output_folder, exist_ok=True)
